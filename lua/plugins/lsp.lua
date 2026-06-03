@@ -13,6 +13,14 @@ return {
             {
               "<leader>k",
               function()
+                -- In Rust buffers use rustaceanvim's "hover actions" (the
+                -- VSCode-style popup: type + docs + jumps to impls/refs/run).
+                -- rustaceanvim does NOT override vim.lsp.buf.hover, so the
+                -- plain hover never shows these. Fall back to plain hover if
+                -- the command isn't available (e.g. before the LSP attaches).
+                if vim.bo.filetype == "rust" and pcall(vim.cmd.RustLsp, { "hover", "actions" }) then
+                  return
+                end
                 return vim.lsp.buf.hover()
               end,
               desc = "Hover",
