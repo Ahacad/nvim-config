@@ -14,5 +14,8 @@ opt.guicursor = "a:block" -- block cursor in every mode, including insert
 
 vim.g.snacks_animate = false -- no smooth scrolling
 
+-- Diff filler regions render as a flat band, not rows of ╱ hatch ("zebra").
+opt.fillchars:append({ diff = " " })
+
 -- Pin the Python provider so nvim doesn't probe for an interpreter on startup.
 vim.g.python3_host_prog = "/usr/bin/python3"
