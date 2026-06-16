@@ -1,6 +1,23 @@
 return {
   {
     "neovim/nvim-lspconfig",
+    -- Neovim 0.11+ installs a buffer-local `K -> vim.lsp.buf.hover()` whenever a
+    -- hover-capable server attaches, but ONLY if no `K` map exists at that moment
+    -- (it guards on `maparg('K','n') == ''`). Our movement map `K -> 5k` lives in
+    -- config/keymaps.lua, which LazyVim loads on VeryLazy. A file opened directly
+    -- (`nvim foo.py`) attaches its server *before* VeryLazy, so the guard sees no
+    -- K and installs the buffer-local hover; being buffer-local it then shadows
+    -- the global `5k` for the life of that buffer. K fires hover, and a server
+    -- with nothing to say (pyright on a bare name) reports "No information
+    -- available". Deleting the default after the fact is whack-a-mole: pyright
+    -- registers hover via client/registerCapability, which re-runs the install
+    -- after LspAttach. Instead, seed the global map here in `init` (runs at
+    -- startup, before any buffer is read) so the guard always finds K bound and
+    -- the default is never created. config/keymaps.lua re-asserts the same
+    -- binding on VeryLazy; keep both in sync.
+    init = function()
+      vim.keymap.set({ "n", "x" }, "K", "5k", { desc = "Move 5 lines up" })
+    end,
     opts = {
       -- No inline type hints.
       inlay_hints = { enabled = false },
