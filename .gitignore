@@ -6,3 +6,6 @@ debug
 foo.*
 *.log
 data
+
+# Claude Code background-job worktrees (tooling cruft)
+.claude/worktrees/
