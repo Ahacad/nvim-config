@@ -46,7 +46,11 @@ return {
                     return
                   end
                 end
-                return vim.lsp.buf.hover()
+                -- Border + size: native float opts (vim.lsp.buf.hover.Opts
+                -- extends open_floating_preview.Opts). Composes with Noice's
+                -- markdown styling; the Rust hover-actions branch above is
+                -- rustaceanvim's own float and is unaffected.
+                return vim.lsp.buf.hover({ border = "rounded", max_width = 80, max_height = 25 })
               end,
               desc = "Hover",
             },
