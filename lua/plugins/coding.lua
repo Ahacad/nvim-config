@@ -40,6 +40,17 @@ return {
       vim.opt.sidescrolloff = 36
       vim.g.neominimap = {
         auto_enable = true,
+        -- No minimap in diff panes. Keys on window-local `diff`, so it covers
+        -- diffview (gdv), native :diffthis / nvim -d, and git mergetool alike.
+        win_filter = function(winid)
+          return not vim.wo[winid].diff
+        end,
+        -- Skip diffview's own side panels (file tree / history list).
+        exclude_filetypes = {
+          "help",
+          "DiffviewFiles",
+          "DiffviewFileHistory",
+        },
       }
     end,
   },
