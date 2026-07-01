@@ -21,6 +21,29 @@ return {
     opts = {},
   },
 
+  -- VSCode-style code minimap (braille overview, float on the right).
+  -- Configured via vim.g.neominimap in `init`, not opts/config. Must NOT be
+  -- lazy-loaded — it self-manages enablement via auto_enable. Treesitter,
+  -- gitsigns, and diagnostic integrations are on by default and light up from
+  -- the plugins we already run.
+  {
+    "Isrothy/neominimap.nvim",
+    version = "v3.x.x",
+    lazy = false,
+    keys = {
+      { "<leader>nm", "<cmd>Neominimap toggle<cr>", desc = "Toggle minimap" },
+      { "<leader>nf", "<cmd>Neominimap focus<cr>", desc = "Focus minimap" },
+      { "<leader>nu", "<cmd>Neominimap unfocus<cr>", desc = "Unfocus minimap" },
+    },
+    init = function()
+      vim.opt.wrap = false
+      vim.opt.sidescrolloff = 36
+      vim.g.neominimap = {
+        auto_enable = true,
+      }
+    end,
+  },
+
   -- Completion: use blink.cmp's `default` preset so accept/navigate stay on
   -- Ctrl keys (<C-y> accept, <C-n>/<C-p> move, <C-e> cancel) and <CR> is free.
   -- See lua/plugins/workarounds.lua for the <Left>/<Right> mini.pairs fix the
