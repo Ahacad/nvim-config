@@ -21,6 +21,13 @@ return {
       view = {
         merge_tool = { layout = "diff3_mixed" },
       },
+      hooks = {
+        -- Diffview tabs start with the minimap toggled off — plain toggle
+        -- state, not a filter, so <leader>nm (TabToggle) brings it back.
+        view_opened = function(view)
+          require("neominimap.api").tab.disable(view.tabpage)
+        end,
+      },
     },
     keys = {
       { "<leader>gd", "", desc = "+diffview" },
