@@ -21,7 +21,7 @@ return {
     opts = {},
   },
 
-  -- VSCode-style code minimap (braille overview, float on the right).
+  -- VSCode-style code minimap (braille overview, split on the right).
   -- Configured via vim.g.neominimap in `init`, not opts/config. Must NOT be
   -- lazy-loaded — it self-manages enablement via auto_enable. Treesitter,
   -- gitsigns, and diagnostic integrations are on by default and light up from
@@ -40,7 +40,7 @@ return {
           local winid = vim.api.nvim_get_current_win()
           if vim.wo[winid].diff then
             vim.w[winid].neominimap_diff_show = not vim.w[winid].neominimap_diff_show
-            require("neominimap.api").win.refresh(winid)
+            require("neominimap.api").tab.refresh(vim.api.nvim_win_get_tabpage(winid))
           else
             require("neominimap.api").win.toggle(winid)
           end
@@ -49,16 +49,27 @@ return {
       },
     },
     init = function()
-      vim.opt.wrap = false
-      vim.opt.sidescrolloff = 36
       vim.g.neominimap = {
         auto_enable = true,
+        -- A real split window on the right edge: unlike the float layout, it
+        -- can never cover buffer text.
+        layout = "split",
+        split = { close_if_last_window = true },
         -- Minimap defaults to off in diff panes; <leader>nw opts a window back
         -- in via the neominimap_diff_show window var. Keys on window-local
         -- `diff`, so it covers diffview (gdv), native :diffthis / nvim -d, and
         -- git mergetool alike.
         win_filter = function(winid)
           return not vim.wo[winid].diff or vim.w[winid].neominimap_diff_show == true
+        end,
+        -- The split is one column per tab: show it only in tabs where some
+        -- window qualifies, so pure-diff tabs get no dead minimap column.
+        tab_filter = function(tabid)
+          return vim.iter(vim.api.nvim_tabpage_list_wins(tabid)):any(function(winid)
+            return vim.api.nvim_win_get_config(winid).relative == ""
+              and (not vim.wo[winid].diff or vim.w[winid].neominimap_diff_show == true)
+              and require("neominimap.buffer").get_minimap_bufnr(vim.api.nvim_win_get_buf(winid)) ~= nil
+          end)
         end,
         -- Skip diffview's own side panels (file tree / history list).
         exclude_filetypes = {
