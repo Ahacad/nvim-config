@@ -34,16 +34,31 @@ return {
       { "<leader>nm", "<cmd>Neominimap toggle<cr>", desc = "Toggle minimap" },
       { "<leader>nf", "<cmd>Neominimap focus<cr>", desc = "Focus minimap" },
       { "<leader>nu", "<cmd>Neominimap unfocus<cr>", desc = "Unfocus minimap" },
+      {
+        "<leader>nw",
+        function()
+          local winid = vim.api.nvim_get_current_win()
+          if vim.wo[winid].diff then
+            vim.w[winid].neominimap_diff_show = not vim.w[winid].neominimap_diff_show
+            require("neominimap.api").win.refresh(winid)
+          else
+            require("neominimap.api").win.toggle(winid)
+          end
+        end,
+        desc = "Toggle minimap (window)",
+      },
     },
     init = function()
       vim.opt.wrap = false
       vim.opt.sidescrolloff = 36
       vim.g.neominimap = {
         auto_enable = true,
-        -- No minimap in diff panes. Keys on window-local `diff`, so it covers
-        -- diffview (gdv), native :diffthis / nvim -d, and git mergetool alike.
+        -- Minimap defaults to off in diff panes; <leader>nw opts a window back
+        -- in via the neominimap_diff_show window var. Keys on window-local
+        -- `diff`, so it covers diffview (gdv), native :diffthis / nvim -d, and
+        -- git mergetool alike.
         win_filter = function(winid)
-          return not vim.wo[winid].diff
+          return not vim.wo[winid].diff or vim.w[winid].neominimap_diff_show == true
         end,
         -- Skip diffview's own side panels (file tree / history list).
         exclude_filetypes = {
