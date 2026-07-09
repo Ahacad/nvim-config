@@ -21,6 +21,13 @@ return {
       view = {
         merge_tool = { layout = "diff3_mixed" },
       },
+      hooks = {
+        -- Wrap long lines in diff buffers; the neominimap init sets global
+        -- nowrap, so this must be per-window.
+        diff_buf_win_enter = function(_, winid, _)
+          vim.wo[winid].wrap = true
+        end,
+      },
     },
     keys = {
       { "<leader>gd", "", desc = "+diffview" },
